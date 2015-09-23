@@ -27,11 +27,16 @@ set1.pcap
 =================================================================
 
 set2.pcap
-10. 
-11.
-12.
-13.
-14.
+10. 77982 packets 
+11. 1
+12. ettercap -T -r set2.pcap 
+13. The one set of credentials used
+    protocol: IMAP
+    server IP: 87.120.13.118
+    domain name: 
+    port: 143
+14.   larry@radsot.com is legitamate because after login, the 
+    server responds saying 'OK LOGIN Ok'
 =================================================================
 
 set3.pcap
