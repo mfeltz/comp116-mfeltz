@@ -12,7 +12,7 @@ set1.pcap
 3. TCP was created for open communication and therefore allows for
    sniffing and the ability to interupt packets and send malicious
    packets back to a computer on a receiving end. 
-4. 
+4. SFTP 
 5. 192.168.99.130
 6. defcon, m1ngisablowhard
 7. 6 files
@@ -28,25 +28,169 @@ set1.pcap
 
 set2.pcap
 10. 77982 packets 
-11. 1
-12. ettercap -T -r set2.pcap 
-13. The one set of credentials used
+11. 12 pairs, 11 of which are anonymous
+12. ettercap -T -r set2.pcap | grep -a "PASS" 
+    dsniff -p set2.pcap
+13. protocol: udp
+    server IP: 192.168.1.200
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 192.168.15.12
+    domain name: unknown
+    port:161
+
+    protocol: udp
+    server IP: 192.168.15.12
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 192.168.15.12
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 10.5.10.10
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 10.5.10.10
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 10.5.10.10
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 10.5.10.10
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 192.168.1.3
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 192.168.1.3
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 10.150.23.31
+    domain name: unknown
+    port: 161
+
     protocol: IMAP
     server IP: 87.120.13.118
-    domain name: 
-    port: 143
-14.   larry@radsot.com is legitamate because after login, the 
-    server responds saying 'OK LOGIN Ok'
+    domain name: email server in Bulgaria
+    port: 143 
+
+14.   One username-password pair is legitimate. larry@radsot.com
+is legitamate because after login, the server responds saying 
+'OK LOGIN Ok'
 =================================================================
 
 set3.pcap
-15.
-16.
-17.
-18.
+15. Running 'dsniff -p set3.pcap -n' returned a lot of results with
+the defcon result appearing multiple times. I found 11 unique username
+and password pairs, 9 of which were generic.
 
+16. protocol: tcp
+    server IP: 162.222.171.208
+    domain name: forum.defcon.org
+    port: 80
+
+    protocol: tcp
+    server IP: 54.191.109.23
+    domain name: ec2.intelctf.com
+    port: 80
+
+    protocol: udp
+    server IP: 10.5.10.10
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 10.0.8.254
+    domain name: unknown 
+    port: 161
+
+    protocol: udp
+    server IP: 192.168.15.12
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 192.168.1.200
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 192.168.1.3
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 10.0.8.253
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 172.16.15.31
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 192.168.1.11
+    domain name: unknown
+    port: 161
+
+    protocol: udp
+    server IP: 10.26.9.147
+    domain name: unknown
+    port: 161
+
+
+17. Of the 2 non-generic username-password pairs, one is legitimate.
+The username=seymore,password=butts pair hits a 403 Forbidden page
+on forum.defcon.com saying that the credentials don't work on http.
+The username=jeff,password=asdasdasd pair hits an Unauthorized page
+that tells the user that they either don't have access to the page
+or they entered the wrong credentials. 
+ 
+18. 68, s3-1.amazonaws.com
+    852, 1.client-channel.goog
+    2669 - Broadcast
+    69464 - Vmware
+    56884 - liverail.c10r.facebook.com
+    57039 - autodiscover.jyu.fi
+    59240 - map3.hwcdn.net
+    61208 - map2.hwcdn.net
+    71889 - control-wc.adap.tv
+    16012 - forum.defcon.org
+    75198, www.gstatic.com
+These are all hostnames associated with packet numbers. a ','
+indicates hostname of source IP of the packet and a '-' indicates
+hostname of destination IP. I went into settings and checked off
+resolve IP addresses and it replaced the IP addresses with their
+corresponding hostnames. I wasn't able to sort by unique hostnames
+but if I had more time to, I would sort by unique hostnames
+to compile a list of all of them and their associated IP addresses.
 =================================================================
 
 General Questions
-19.
-20.
+19. To verify the successful username-password pairs, I found the
+corresponding packet in Wireshark and followed the TCP stream. By
+reading the messages between the server and the machine, once a
+user entered their credentials, the server would respond along the
+lines of 'OK LOGIN' to verify the login was successful.
+
+20. My advice to these users is to use a secure file transfer
+protocol such as SFTP to protect their sensitive information from
+being sniffed.
