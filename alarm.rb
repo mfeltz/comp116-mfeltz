@@ -108,7 +108,7 @@ def print_log_alert(incident_count, message, line)
 	by_quotes = line.split("\"")
 	ip_address = by_space[0]
 	payload = by_quotes[1]
-	protocol = by_space[7].split("\"")[0]
+	protocol = by_space[7].split("\/")[0]
 
 	puts "#{incident_count}. ALERT: #{message} is detected from #{ip_address} (#{protocol}) (#{payload})!"
 end
