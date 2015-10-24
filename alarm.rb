@@ -1,5 +1,4 @@
 require 'packetfu'
-include PacketFu
 
 # checks if NULL scan by checking that all 
 # flags are off
@@ -61,44 +60,57 @@ end
 # function to print live incident alerts
 def print_live_alert(incident_count, message, pkt)
 	 puts "#{incident_count}. ALERT: #{message} is detected from #{pkt.ip_saddr} (#{pkt.proto()[-1]}) (#{pkt.payload})!"
+end
 
 # function to analyze live stream
 # captures and parses input to get packets and checks
 # for each type of scan or leak
 def analyze_live
 	incident_count = 0
-	cap = Capture.new(:start =>true, :iface => iface, :promisc => true)
+	cap = PacketFu::Capture.new(:start =>true, :iface => iface, :promisc => true)
 	cap.stream.each do |p|
-	pkt = Packet.parse(p)
-	if pkt.is_ip?
-		if pkt.is_tcp?
-			flags = pkt.tcp_flags.to_i
-			if is_null_scan?(flags)
-				incident_count++
-				print_live_alert incident_count, "NULL scan", pkt 
+		pkt = PacketFu::Packet.parse(p)
+		if pkt.is_ip?
+			if pkt.is_tcp?
+				flags = pkt.tcp_flags.to_i
+				if is_null_scan?(flags)
+					incident_count++
+					print_live_alert(incident_count, "NULL scan", pkt)
+				end
+				if is_fin_scan?(flags)
+					incident_count++
+					print_live_alert(incident_count, "FIN scan", pkt)
+				end
+				if is_null_scan?(flags)
+					incident_count++
+					print_live_alert(incident_count, ". ALERT: XMAS scan is detected from ", pkt)
+				end
 			end
-			if is_fin_scan?(flags)
+			if is_nmap_scan? pkt
 				incident_count++
-				print_live_alert incident_count, "FIN scan", pkt 
+				print_live_alert(incident_count, ". ALERT: Nmap scan is detected from ", pkt)
 			end
-			if is_null_scan?(flags)
+			if is_nikto_scan? pkt
 				incident_count++
-				print_live_alert incident_count, ". ALERT: XMAS scan is detected from ", pkt 
+				print_live_alert(incident_count, ". ALERT: Nikto scan is detected from ", pkt)
 			end
-		end
-		if is_nmap_scan? pkt
-			incident_count++
-			print_live_alert incident_count, ". ALERT: Nmap scan is detected from ", pkt 
-		end
-		if is_nikto_scan? pkt
-			incident_count++
-			print_live_alert incident_count, ". ALERT: Nikto scan is detected from ", pkt 
-		end
-		if is_credit_card? pkt
-			incident_count++
-			print_live_alert incident_count, ". ALERT: Credit card leaked in the clear from ", pkt
+			if is_credit_card? pkt
+				incident_count++
+				print_live_alert(incident_count, ". ALERT: Credit card leaked in the clear from ", pkt)
+			end
 		end
 	end
+end
+
+# function to print live incident alerts
+def print_log_alert(incident_count, message, line)
+	by_space = line.split(' ')
+	by_quotes = line.split("\"")
+	ip_address = by_space[0]
+	payload = by_quotes[1]
+	protocol = by_space[7].split("\"")[0]
+
+	puts "#{incident_count}. ALERT: #{message} is detected from #{ip_address} (#{protocol}) (#{payload})!"
 end
 
 # function to analyze web server log
@@ -109,27 +121,27 @@ def analyze_log(file)
 		# nmap
 		if /nmap/.match(line) != nil
 			incident_count++
-			print_live_alert incident_count, ". ALERT: Nmap scan is detected from ", pkt 
+			print_log_alert(incident_count, "Nmap scan", line)
 		end
 		# nikto
 		if /nikto/.match(line) != nil
 			incident_count++
-			print_live_alert incident_count, ". ALERT: Nikto scan is detected from ", pkt 
+			print_log_alert(incident_count, "Nikto scan", line)
 		end
 		# masscan
 		if /masscan/.match(line) != nil
 			incident_count++
-			print_live_alert incident_count, ". ALERT: Someone running Masscan is detected from ", pkt 
+			print_log_alert(incident_count, "Someone running Masscan", line)
 		end
 		# Shellshock () { :;}; or () { :; };
 		if /\(\)\s\{\s\:\;\s*\}\;/.match(line) != nil
 			incident_count++
-			print_live_alert incident_count, ". ALERT: Someone scanning for Shellshock vulnerability is detected from ", pkt 
+			print_log_alert(incident_count, "Someone scanning for Shellshock vulnerability", line)
 		end
 		# phpMyAdmin
 		if /phpMyAdmin/.match(line) != nil
 			incident_count++
-			print_live_alert incident_count, ". ALERT: Someone looking for phpMyAdmin stuff is detected from ", pkt 
+			print_log_alert(incident_count, "Someone looking for phpMyAdmin stuff", line)
 		end
 	end
 end
