@@ -118,30 +118,32 @@ end
 def analyze_log(file)
 	incident_count = 0
 	file.each do |line|
-		# nmap
-		if /nmap/.match(line) != nil
-			incident_count++
-			print_log_alert(incident_count, "Nmap scan", line)
-		end
-		# nikto
-		if /nikto/.match(line) != nil
-			incident_count++
-			print_log_alert(incident_count, "Nikto scan", line)
-		end
-		# masscan
-		if /masscan/.match(line) != nil
-			incident_count++
-			print_log_alert(incident_count, "Someone running Masscan", line)
-		end
-		# Shellshock () { :;}; or () { :; };
-		if /\(\)\s\{\s\:\;\s*\}\;/.match(line) != nil
-			incident_count++
-			print_log_alert(incident_count, "Someone scanning for Shellshock vulnerability", line)
-		end
-		# phpMyAdmin
-		if /phpMyAdmin/.match(line) != nil
-			incident_count++
-			print_log_alert(incident_count, "Someone looking for phpMyAdmin stuff", line)
+		if line != nil	
+			# nmap
+			if /nmap/.match(line) != nil
+				incident_count++
+				print_log_alert(incident_count, "Nmap scan", line)
+			end
+			# nikto
+			if /nikto/.match(line) != nil
+				incident_count++
+				print_log_alert(incident_count, "Nikto scan", line)
+			end
+			# masscan
+			if /masscan/.match(line) != nil
+				incident_count++
+				print_log_alert(incident_count, "Someone running Masscan", line)
+			end
+			# Shellshock () { :;}; or () { :; };
+			if /\(\)\s\{\s\:\;\s*\}\;/.match(line) != nil
+				incident_count++
+				print_log_alert(incident_count, "Someone scanning for Shellshock vulnerability", line)
+			end
+			# phpMyAdmin
+			if /phpMyAdmin/.match(line) != nil
+				incident_count++
+				print_log_alert(incident_count, "Someone looking for phpMyAdmin stuff", line)
+			end
 		end
 	end
 end
