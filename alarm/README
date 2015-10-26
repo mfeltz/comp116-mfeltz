@@ -2,4 +2,30 @@ COMP 116 - Assignment 2
 Margaret Feltz
 README
 
+All aspects of the assignment have been implemented correctly. My alarm.rb
+correctly analyzes a live stream of network packets as well as a log for
+incidents. 
 
+The live analysis correctly identifies NULL scan, FIN scan, Xmas scans by
+searching the packet flags for which ones are toggled on, and Nmap scans,
+Nikto scans, and Credit card leaks by searching the packet payload
+for patterns using regular expressions.
+ 
+The log analysis correctly identifies Nmap scans, Nikto scans, Rob Graham's
+Masscan, and anything pertaining to phpMyAdmin by searching for the strings
+'nmap', 'nikto', 'masscan', and 'phpMyAdmin' respectivley using regular
+expressions. Shellshock and shellcode incidents are found using patterns
+and regular expressions.
+
+I collaborated with Susie Church and Sam Weiss.
+
+I spent approximately 5 hours on this assignment, reading and developing.
+
+1. The heuristics are not very good because the checks for each type of
+scan or incident are very simple. More malicious and cautiously executed
+scans would probably be harder to discover.
+
+2. I think for simplicity sake, for the logs, I would print out a frequency
+table of each type of incident detected. Then require that flags be
+implemented to clarify if details of each scan or provide the ability to
+filter by type of incident.
